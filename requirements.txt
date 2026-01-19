@@ -1,0 +1,55 @@
+# ========================================
+# 注意：本项目已迁移到UV包管理工具
+# ========================================
+# 
+# 推荐使用UV进行依赖管理，请参考以下命令：
+# 
+# 1. 安装UV:
+#    Windows: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+#    Linux/Mac: curl -LsSf https://astral.sh/uv/install.sh | sh
+# 
+# 2. 同步依赖:
+#    uv sync --extra dev
+# 
+# 3. 运行脚本:
+#    uv run python script.py
+# 
+# 详细使用说明请查看: UV_USAGE.md
+# 
+# ========================================
+# 以下为原始依赖列表（仅作参考）
+# ========================================
+
+# 爬虫框架
+scrapy>=2.11.0
+selenium>=4.16.0
+playwright>=1.40.0
+
+# Agent框架
+langchain>=0.1.0
+langchain-openai>=0.0.8
+openai>=1.10.0
+
+# 数据处理
+pandas>=2.1.0
+numpy>=1.26.0
+
+# 数据存储
+sqlalchemy>=2.0.0
+
+# 可视化
+matplotlib>=3.8.0
+seaborn>=0.13.0
+plotly>=5.18.0
+
+# 其他工具
+python-dotenv>=1.0.0
+apscheduler>=3.10.0
+requests>=2.31.0
+beautifulsoup4>=4.12.0
+lxml>=4.9.0
+
+# 开发工具
+pytest>=7.4.0
+flake8>=6.0.0
+black>=23.0.0

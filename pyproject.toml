@@ -1,0 +1,98 @@
+[project]
+name = "smilex-agent-mark"
+version = "0.1.0"
+description = "运营增长Agent系统，用于内容评估和数据分析"
+requires-python = ">=3.9"
+authors = [
+    { name = "SmileX Team" }
+]
+dependencies = [
+    # 爬虫框架
+    "scrapy>=2.11.0",
+    "selenium>=4.16.0",
+    "playwright>=1.40.0",
+    
+    # Agent框架
+    "langchain>=0.1.0",
+    "langchain-openai>=0.0.8",
+    "openai>=1.10.0",
+    
+    # 数据处理
+    "pandas>=2.1.0",
+    "numpy>=1.26.0",
+    
+    # 数据存储
+    "sqlalchemy>=2.0.0",
+    
+    # 可视化
+    "matplotlib>=3.8.0",
+    "seaborn>=0.13.0",
+    "plotly>=5.18.0",
+    
+    # 其他工具
+    "python-dotenv>=1.0.0",
+    "apscheduler>=3.10.0",
+    "requests>=2.31.0",
+    "beautifulsoup4>=4.12.0",
+    "lxml>=4.9.0",
+    "python-dateutil>=2.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "flake8>=6.0.0",
+    "black>=23.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["agent", "crawler", "data", "utils", "visualization", "config"]
+
+[dependency-groups]
+dev = [
+    "pytest>=7.4.0",
+    "flake8>=6.0.0",
+    "black>=23.0.0",
+]
+
+[tool.black]
+line-length = 100
+target-version = ['py38']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # 排除目录
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short"
+
+[tool.flake8]
+max-line-length = 100
+extend-ignore = ["E203", "W503"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "build",
+    "dist",
+]
