@@ -94,8 +94,8 @@ if __name__ == "__main__":
     success = test_search_functionality()
     
     if success:
-        print("\n✅ 搜索功能测试成功！")
+        print("\n[成功] 搜索功能测试成功！")
         sys.exit(0)
     else:
-        print("\n❌ 搜索功能测试失败！")
+        print("\n[失败] 搜索功能测试失败！")
         sys.exit(1)
