@@ -97,7 +97,19 @@ SmileX-Agent-Mark/
 
 - 直接运行Python脚本
   ```bash
-  python main.py
+  uv run python main.py
+  ```
+
+- 运行测试脚本
+  ```bash
+  uv run python test.py
+  uv run python test_evaluator.py
+  uv run python test_evaluator_from_storage.py
+  ```
+
+- 运行数据库迁移脚本
+  ```bash
+  uv run python migrate_database.py
   ```
 
 ### 主要功能说明

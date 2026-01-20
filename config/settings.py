@@ -26,8 +26,17 @@ LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 DATABASE_URL = "sqlite:///" + os.path.join(DATA_DIR, "smilex_agent.db")
 
 # 大模型配置
+# OpenAI配置（默认）
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4")
+
+# VLLM配置（本地部署）
+VLLM_API_BASE = os.getenv("VLLM_API_BASE", "http://localhost:6401/v1")
+VLLM_API_KEY = os.getenv("VLLM_API_KEY", "empty")  # vllm本地部署一般不需要API密钥
+VLLM_MODEL = os.getenv("VLLM_MODEL", "Qwen/Qwen3-8B")
+
+# 使用的大模型类型："openai" 或 "vllm"
+LLM_TYPE = os.getenv("LLM_TYPE", "vllm")
 
 # 爬虫配置
 CRAWLER_CONFIG = {

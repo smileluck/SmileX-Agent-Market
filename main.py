@@ -27,13 +27,13 @@ def main():
         zhihu_crawler = ZhihuCrawler()
         chart_generator = ChartGenerator()
         
-        # 2. 爬取知乎热门问题
-        logger.info("开始爬取知乎热门问题...")
-        questions = zhihu_crawler.get_hot_questions(limit=20)
+        # # 2. 爬取知乎热门问题
+        # logger.info("开始爬取知乎热门问题...")
+        # questions = zhihu_crawler.get_hot_questions(limit=20)
         
-        if not questions:
-            logger.warning("未爬取到知乎热门问题")
-            return
+        # if not questions:
+        #     logger.warning("未爬取到知乎热门问题")
+        #     return
         
         # 3. 保存问题到数据库
         logger.info("保存知乎热门问题到数据库...")

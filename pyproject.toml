@@ -96,3 +96,6 @@ exclude = [
     "build",
     "dist",
 ]
+
+[project.scripts]
+smilex-agent = "main:main"

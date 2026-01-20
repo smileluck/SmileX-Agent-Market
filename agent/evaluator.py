@@ -4,14 +4,14 @@
 import re
 from typing import Dict, Any, Optional
 from langchain_core.prompts import PromptTemplate
-from langchain_openai import OpenAI
+from langchain_openai import ChatOpenAI
 from agent.prompt_templates import (
     QUALITY_EVALUATION_PROMPT,
     SPREAD_POTENTIAL_PROMPT,
     OPERATION_VALUE_PROMPT,
     COMPREHENSIVE_EVALUATION_PROMPT
 )
-from config.settings import OPENAI_API_KEY, OPENAI_MODEL
+from config.settings import OPENAI_API_KEY, OPENAI_MODEL, LLM_TYPE, VLLM_API_BASE, VLLM_API_KEY, VLLM_MODEL
 from utils.logger import setup_logger
 
 logger = setup_logger(__name__)
@@ -26,16 +26,28 @@ class ContentEvaluator:
         """
         初始化内容评估器
         """
-        if not OPENAI_API_KEY:
-            raise ValueError("OpenAI API密钥未配置，请在环境变量中设置OPENAI_API_KEY")
-        
-        # 初始化LLM
-        self.llm = OpenAI(
-            model=OPENAI_MODEL,
-            api_key=OPENAI_API_KEY,
-            temperature=0.3,
-            max_tokens=500
-        )
+        # 根据配置选择LLM类型
+        if LLM_TYPE == "vllm":
+            # 使用本地VLLM部署的模型
+            logger.info(f"使用VLLM模型: {VLLM_MODEL}，API地址: {VLLM_API_BASE}")
+            self.llm = ChatOpenAI(
+                model=VLLM_MODEL,
+                api_key=VLLM_API_KEY,
+                base_url=VLLM_API_BASE,
+                temperature=0.3,
+                max_tokens=500
+            )
+        else:
+            # 使用OpenAI模型
+            if not OPENAI_API_KEY:
+                raise ValueError("OpenAI API密钥未配置，请在环境变量中设置OPENAI_API_KEY")
+            logger.info(f"使用OpenAI模型: {OPENAI_MODEL}")
+            self.llm = ChatOpenAI(
+                model=OPENAI_MODEL,
+                api_key=OPENAI_API_KEY,
+                temperature=0.3,
+                max_tokens=500
+            )
         
         # 初始化评估提示模板
         self._init_evaluation_prompts()

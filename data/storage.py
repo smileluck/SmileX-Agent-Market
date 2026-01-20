@@ -369,6 +369,61 @@ class DataStorage:
         finally:
             db.close()
     
+    def get_zhihu_answers(self, limit: int = 100, offset: int = 0) -> List[ZhihuAnswer]:
+        """
+        获取知乎回答列表
+        
+        Args:
+            limit (int, optional): 返回数量限制. Defaults to 100.
+            offset (int, optional): 偏移量. Defaults to 0.
+        
+        Returns:
+            List[ZhihuAnswer]: 知乎回答列表
+        """
+        db = next(self.get_db())
+        
+        try:
+            answers = db.query(ZhihuAnswer).order_by(
+                ZhihuAnswer.crawl_time.desc()
+            ).limit(limit).offset(offset).all()
+            
+            logger.info(f"获取到 {len(answers)} 个知乎回答")
+            return answers
+        except Exception as e:
+            logger.error(f"获取知乎回答失败，错误: {str(e)}")
+            return []
+        finally:
+            db.close()
+    
+    def get_zhihu_answer_by_id(self, answer_id: str) -> Optional[ZhihuAnswer]:
+        """
+        根据ID获取知乎回答
+        
+        Args:
+            answer_id (str): 知乎回答ID
+        
+        Returns:
+            Optional[ZhihuAnswer]: 知乎回答对象，不存在则返回None
+        """
+        db = next(self.get_db())
+        
+        try:
+            answer = db.query(ZhihuAnswer).filter(
+                ZhihuAnswer.answer_id == answer_id
+            ).first()
+            
+            if answer:
+                logger.info(f"获取到知乎回答: {answer.answer_id}")
+            else:
+                logger.info(f"未找到知乎回答，ID: {answer_id}")
+            
+            return answer
+        except Exception as e:
+            logger.error(f"获取知乎回答失败，错误: {str(e)}")
+            return None
+        finally:
+            db.close()
+    
     def get_content_scores(self, content_type: str = None, 
                           limit: int = 100, offset: int = 0) -> List[ContentScore]:
         """
