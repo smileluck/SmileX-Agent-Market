@@ -3,8 +3,7 @@
 """
 import re
 from typing import Dict, Any, Optional
-from langchain.chains import LLMChain
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from langchain_openai import OpenAI
 from agent.prompt_templates import (
     QUALITY_EVALUATION_PROMPT,
@@ -32,53 +31,41 @@ class ContentEvaluator:
         
         # 初始化LLM
         self.llm = OpenAI(
-            model_name=OPENAI_MODEL,
-            openai_api_key=OPENAI_API_KEY,
+            model=OPENAI_MODEL,
+            api_key=OPENAI_API_KEY,
             temperature=0.3,
             max_tokens=500
         )
         
-        # 初始化评估链
-        self._init_evaluation_chains()
+        # 初始化评估提示模板
+        self._init_evaluation_prompts()
     
-    def _init_evaluation_chains(self):
+    def _init_evaluation_prompts(self):
         """
-        初始化各种评估链
+        初始化各种评估提示模板
         """
-        # 内容质量评估链
-        self.quality_chain = LLMChain(
-            llm=self.llm,
-            prompt=PromptTemplate(
-                input_variables=["content"],
-                template=QUALITY_EVALUATION_PROMPT
-            )
+        # 内容质量评估提示
+        self.quality_prompt = PromptTemplate(
+            input_variables=["content"],
+            template=QUALITY_EVALUATION_PROMPT
         )
         
-        # 传播潜力评估链
-        self.spread_chain = LLMChain(
-            llm=self.llm,
-            prompt=PromptTemplate(
-                input_variables=["content"],
-                template=SPREAD_POTENTIAL_PROMPT
-            )
+        # 传播潜力评估提示
+        self.spread_prompt = PromptTemplate(
+            input_variables=["content"],
+            template=SPREAD_POTENTIAL_PROMPT
         )
         
-        # 运营价值评估链
-        self.operation_chain = LLMChain(
-            llm=self.llm,
-            prompt=PromptTemplate(
-                input_variables=["content"],
-                template=OPERATION_VALUE_PROMPT
-            )
+        # 运营价值评估提示
+        self.operation_prompt = PromptTemplate(
+            input_variables=["content"],
+            template=OPERATION_VALUE_PROMPT
         )
         
-        # 综合评估链
-        self.comprehensive_chain = LLMChain(
-            llm=self.llm,
-            prompt=PromptTemplate(
-                input_variables=["content"],
-                template=COMPREHENSIVE_EVALUATION_PROMPT
-            )
+        # 综合评估提示
+        self.comprehensive_prompt = PromptTemplate(
+            input_variables=["content"],
+            template=COMPREHENSIVE_EVALUATION_PROMPT
         )
     
     def evaluate_quality(self, content: str) -> Dict[str, Any]:
@@ -94,7 +81,10 @@ class ContentEvaluator:
         logger.info("开始评估内容质量")
         
         try:
-            result = self.quality_chain.run(content=content)
+            # 生成完整提示
+            prompt = self.quality_prompt.format(content=content)
+            # 调用LLM
+            result = self.llm.invoke(prompt)
             parsed_result = self._parse_quality_result(result)
             logger.info("内容质量评估完成")
             return parsed_result
@@ -115,7 +105,10 @@ class ContentEvaluator:
         logger.info("开始评估内容传播潜力")
         
         try:
-            result = self.spread_chain.run(content=content)
+            # 生成完整提示
+            prompt = self.spread_prompt.format(content=content)
+            # 调用LLM
+            result = self.llm.invoke(prompt)
             parsed_result = self._parse_spread_result(result)
             logger.info("内容传播潜力评估完成")
             return parsed_result
@@ -136,7 +129,10 @@ class ContentEvaluator:
         logger.info("开始评估内容运营价值")
         
         try:
-            result = self.operation_chain.run(content=content)
+            # 生成完整提示
+            prompt = self.operation_prompt.format(content=content)
+            # 调用LLM
+            result = self.llm.invoke(prompt)
             parsed_result = self._parse_operation_result(result)
             logger.info("内容运营价值评估完成")
             return parsed_result
@@ -157,7 +153,10 @@ class ContentEvaluator:
         logger.info("开始综合评估内容")
         
         try:
-            result = self.comprehensive_chain.run(content=content)
+            # 生成完整提示
+            prompt = self.comprehensive_prompt.format(content=content)
+            # 调用LLM
+            result = self.llm.invoke(prompt)
             parsed_result = self._parse_comprehensive_result(result)
             logger.info("内容综合评估完成")
             return parsed_result
