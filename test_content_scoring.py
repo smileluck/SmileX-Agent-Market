@@ -36,26 +36,49 @@ def parse_args():
     parser.add_argument('--verbose', '-v', 
                         action='store_true',
                         help='显示详细日志')
+    parser.add_argument('--evaluation-type', '-e', 
+                        choices=['comprehensive', 'english_article'], 
+                        default='english_article',
+                        help='评估类型 (默认: english_article)')
     return parser.parse_args()
 
-def evaluate_content(evaluator, content_id, content_type, content_text, delay):
+def evaluate_content(evaluator, content_id, content_type, content_text, title, evaluation_type, delay):
     """
     评估单个内容并保存结果
     """
     try:
-        # 综合评估
-        evaluation_result = evaluator.evaluate_comprehensive(content_text)
-        
-        # 保存评估结果
-        score_data = {
-            'content_id': content_id,
-            'content_type': content_type,
-            'quality_score': evaluation_result['quality_score'],
-            'spread_score': evaluation_result['spread_score'],
-            'operation_score': evaluation_result['operation_score'],
-            'total_score': evaluation_result['total_score'],
-            'evaluation_details': evaluation_result['details']
-        }
+        if evaluation_type == 'english_article':
+            # 英语学习文章评估
+            evaluation_result = evaluator.evaluate_english_article(title, content_text)
+            
+            # 保存评估结果
+            score_data = {
+                'content_id': content_id,
+                'content_type': content_type,
+                'total_score': evaluation_result['total_score'],
+                'english_article_score': evaluation_result['total_score'],
+                'target_audience_score': evaluation_result['target_audience_score'],
+                'product_relevance_score': evaluation_result['product_relevance_score'],
+                'learning_advice_score': evaluation_result['learning_advice_score'],
+                'grade': evaluation_result['grade'],
+                'match_analysis': evaluation_result['match_analysis'],
+                'core_pain_points': ','.join(evaluation_result['core_pain_points']),
+                'evaluation_details': f"分级: {evaluation_result['grade']}, 匹配分析: {evaluation_result['match_analysis']}, 核心痛点: {','.join(evaluation_result['core_pain_points'])}"
+            }
+        else:
+            # 综合评估
+            evaluation_result = evaluator.evaluate_comprehensive(content_text)
+            
+            # 保存评估结果
+            score_data = {
+                'content_id': content_id,
+                'content_type': content_type,
+                'quality_score': evaluation_result['quality_score'],
+                'spread_score': evaluation_result['spread_score'],
+                'operation_score': evaluation_result['operation_score'],
+                'total_score': evaluation_result['total_score'],
+                'evaluation_details': evaluation_result['details']
+            }
         
         saved = data_storage.save_content_score(score_data)
         
@@ -89,6 +112,7 @@ def main():
     logger.info(f"评估数量: {args.limit}")
     logger.info(f"起始偏移: {args.offset}")
     logger.info(f"API延迟: {args.delay}秒")
+    logger.info(f"评估方式: {args.evaluation_type}")
     
     try:
         # 1. 初始化评估器
@@ -150,17 +174,32 @@ def main():
         for i, content in enumerate(contents_to_evaluate[:args.limit], 1):
             logger.info(f"\n--- 评估 {i}/{args.limit}: {content['title']} ({content['type']}) ---")
             
+            # 打印待评估内容
+            logger.info(f"待评估内容: {content['text']}...")
+            logger.info(f"内容类型: {content['type']}")
+            logger.info(f"内容ID: {content['id']}")
+            
             result = evaluate_content(
                 evaluator=evaluator,
                 content_id=content['id'],
                 content_type=content['type'],
                 content_text=content['text'],
+                title=content['title'],
+                evaluation_type=args.evaluation_type,
                 delay=args.delay
             )
             
             if result['success']:
                 logger.info(f"✓ 评分成功，总分: {result['result']['total_score']:.2f}")
-                if args.verbose:
+                # if args.verbose:
+                if args.evaluation_type == 'english_article':
+                        logger.info(f"  目标人群相关性: {result['result']['target_audience_score']:.2f}")
+                        logger.info(f"  产品定位相关性: {result['result']['product_relevance_score']:.2f}")
+                        logger.info(f"  学习建议与经历分享: {result['result']['learning_advice_score']:.2f}")
+                        logger.info(f"  分级: {result['result']['grade']}")
+                        logger.info(f"  匹配分析: {result['result']['match_analysis']}")
+                        logger.info(f"  核心用户痛点: {result['result']['core_pain_points']}")
+                else:
                     logger.info(f"  质量评分: {result['result']['quality_score']:.2f}")
                     logger.info(f"  传播潜力评分: {result['result']['spread_score']:.2f}")
                     logger.info(f"  运营价值评分: {result['result']['operation_score']:.2f}")
